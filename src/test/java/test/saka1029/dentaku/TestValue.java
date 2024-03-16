@@ -85,4 +85,41 @@ public class TestValue {
         assertEquals(value(5, 12, 21, 32), v1234.binary(BigDecimal::multiply, v5678));
     }
 
+    @Test
+    public void testMapLogical() {
+        Value v1101 = value(1, 1, 0, 1);
+        assertEquals(value(0, 0, 1, 0), v1101.map(Value.NOT));
+    }
+
+    @Test
+    public void testBinaryCompare() {
+        Value a = value(-1, 0, 1);
+        assertEquals(value(1, 0, 0), a.binary(Value.EQ, value(-1)));
+        assertEquals(value(0, 1, 0), a.binary(Value.EQ, value(0)));
+        assertEquals(value(0, 0, 1), a.binary(Value.EQ, value(1)));
+        assertEquals(value(0, 1, 1), a.binary(Value.NE, value(-1)));
+        assertEquals(value(1, 0, 1), a.binary(Value.NE, value(0)));
+        assertEquals(value(1, 1, 0), a.binary(Value.NE, value(1)));
+        assertEquals(value(0, 0, 0), a.binary(Value.LT, value(-1)));
+        assertEquals(value(1, 0, 0), a.binary(Value.LT, value(0)));
+        assertEquals(value(1, 1, 0), a.binary(Value.LT, value(1)));
+        assertEquals(value(1, 0, 0), a.binary(Value.LE, value(-1)));
+        assertEquals(value(1, 1, 0), a.binary(Value.LE, value(0)));
+        assertEquals(value(1, 1, 1), a.binary(Value.LE, value(1)));
+        assertEquals(value(0, 1, 1), a.binary(Value.GT, value(-1)));
+        assertEquals(value(0, 0, 1), a.binary(Value.GT, value(0)));
+        assertEquals(value(0, 0, 0), a.binary(Value.GT, value(1)));
+        assertEquals(value(1, 1, 1), a.binary(Value.GE, value(-1)));
+        assertEquals(value(0, 1, 1), a.binary(Value.GE, value(0)));
+        assertEquals(value(0, 0, 1), a.binary(Value.GE, value(1)));
+    }
+
+    @Test
+    public void testBinaryLogical() {
+        Value a = value(1, 1, 0, 0), b = value(1, 0, 1, 0);
+        assertEquals(value(1, 0, 0, 0), a.binary(Value.AND, b));
+        assertEquals(value(1, 1, 1, 0), a.binary(Value.OR, b));
+        assertEquals(value(0, 1, 1, 0), a.binary(Value.XOR, b));
+    }
+
 }

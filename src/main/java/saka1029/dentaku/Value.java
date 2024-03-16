@@ -44,7 +44,7 @@ public class Value {
     public static final BOP GT = new BOP((l, r) -> bool(l.compareTo(r) > 0), BigDecimal.ZERO);
     public static final BOP GE = new BOP((l, r) -> bool(l.compareTo(r) >= 0), BigDecimal.ZERO);
 
-    public static final UOP NOT = a -> a.equals(BigDecimal.ZERO) ? BigDecimal.ONE : BigDecimal.ZERO;
+    public static final UOP NOT = a -> bool(!bool(a));
     public static final BOP AND = new BOP((a, b) -> bool(bool(a) && bool(b)), BigDecimal.ONE);
     public static final BOP OR = new BOP((a, b) -> bool(bool(a) || bool(b)), BigDecimal.ZERO);
     public static final BOP XOR = new BOP((a, b) -> bool(bool(a) ^ bool(b)), BigDecimal.ZERO);
