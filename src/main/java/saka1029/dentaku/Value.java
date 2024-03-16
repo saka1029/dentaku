@@ -66,6 +66,10 @@ public class Value {
             throw new ValueException("Length mismatch %d, %d", elements.length, right.elements.length);
     }
 
+    public Value binary(BOP operator, Value right) {
+        return binary(operator.operator(), right);
+    }
+
     @Override
     public int hashCode() {
         return Arrays.hashCode(elements);
