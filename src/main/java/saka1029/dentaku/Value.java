@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 public class Value {
     public static final MathContext MATH_CONTEXT = MathContext.DECIMAL64;
 
+    public static final Value EMPTY = new Value();
     public static final UOP NEG = BigDecimal::negate;
     public static final UOP SIGN = d -> new BigDecimal(d.signum());
     public static final UOP SIN = d -> new BigDecimal(Math.sin(d.doubleValue()), MATH_CONTEXT);
@@ -102,11 +103,24 @@ public class Value {
                 .mapToObj(i -> operator.apply(elements[i], right.elements[i])) 
                 .toArray(BigDecimal[]::new)); 
         else 
-            throw new ValueException("Length mismatch %d, %d", elements.length, right.elements.length);
+            throw new ValueException("Length mismatch %d and %d", elements.length, right.elements.length);
     }
 
     public Value binary(BOP operator, Value right) {
         return binary(operator.operator(), right);
+    }
+
+    public Value select(Value right) {
+        if (elements.length == 1)
+            return bool(elements[0]) ? right : EMPTY;
+        else if (elements.length == right.elements.length) {
+            List<BigDecimal> result = new ArrayList<>();
+            for (int i = 0; i < elements.length; ++i)
+                if (bool(elements[i]))
+                    result.add(right.elements[i]);
+            return new Value(result.toArray(BigDecimal[]::new));
+        } else
+            throw new ValueException("Length mismatch %d and %d", elements.length, right.elements.length);
     }
 
     @Override

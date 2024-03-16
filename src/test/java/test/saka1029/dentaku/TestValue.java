@@ -19,6 +19,17 @@ public class TestValue {
     }
 
     @Test
+    public void testBigDecimal() {
+        assertEquals(3, new BigDecimal("123.456").scale());
+        assertEquals(5, new BigDecimal("1.23456").scale());
+        assertEquals(0, new BigDecimal("123456").scale());
+        assertEquals(3, new BigDecimal("-123.456").scale());
+        assertEquals(5, new BigDecimal("-1.23456").scale());
+        assertEquals(1, new BigDecimal("0.5").scale());
+        assertEquals(1, new BigDecimal("0.5").multiply(new BigDecimal(2)).scale());
+    }
+
+    @Test
     public void testOf() {
         Value v123 = Value.of(dec(1), dec(2), dec(3));
         assertEquals(value(1, 2, 3), v123);
@@ -30,6 +41,9 @@ public class TestValue {
         Value v1234 = value(1, 2, 3, 4);
         assertEquals(value(), v.map(BigDecimal::negate));
         assertEquals(value(-1, -2, -3, -4), v1234.map(BigDecimal::negate));
+        assertEquals(value(-1, 0, 1), value(-4, 0, 8).map(Value.SIGN));
+        assertEquals(value(-1, 0, 1), value(-Math.PI/2, 0, Math.PI/2).map(Value.SIN));
+        assertEquals(value(-1, 1, -1), value(-Math.PI, 0, Math.PI).map(Value.COS));
     }
 
     @Test
@@ -120,6 +134,14 @@ public class TestValue {
         assertEquals(value(1, 0, 0, 0), a.binary(Value.AND, b));
         assertEquals(value(1, 1, 1, 0), a.binary(Value.OR, b));
         assertEquals(value(0, 1, 1, 0), a.binary(Value.XOR, b));
+    }
+
+    @Test
+    public void testBinarySelect() {
+        assertEquals(value(1, 3), value(1, 0, 1, 0).select(value(1, 2, 3, 4)));
+        assertEquals(value(1, 3, 4), value(1, 0, 1, 1).select(value(1, 2, 3, 4)));
+        assertEquals(value(1, 2, 3, 4), value(1).select(value(1, 2, 3, 4)));
+        assertEquals(value(), value(0).select(value(1, 2, 3, 4)));
     }
 
 }
