@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import org.junit.Test;
-import saka1029.dentaku.BOP;
 import saka1029.dentaku.Value;
 
 public class TestValue {
@@ -53,27 +52,24 @@ public class TestValue {
         assertEquals(value(1, 2, 6, 24), v1234.cumulate(BigDecimal::multiply, BigDecimal.ONE));
     }
 
-    static final BOP ADD = new BOP(BigDecimal::add, BigDecimal.ZERO);
-    static final BOP MULT = new BOP(BigDecimal::multiply, BigDecimal.ONE);
-
     @Test
     public void testReduceBOP() {
         Value v = value();
         Value v1234 = value(1, 2, 3, 4);
-        assertEquals(value(0), v.reduce(ADD));
-        assertEquals(value(10), v1234.reduce(ADD));
-        assertEquals(value(1), v.reduce(MULT));
-        assertEquals(value(24), v1234.reduce(MULT));
+        assertEquals(value(0), v.reduce(Value.ADD));
+        assertEquals(value(10), v1234.reduce(Value.ADD));
+        assertEquals(value(1), v.reduce(Value.MULT));
+        assertEquals(value(24), v1234.reduce(Value.MULT));
     }
 
     @Test
     public void testCumulateBOP() {
         Value v = value();
         Value v1234 = value(1, 2, 3, 4);
-        assertEquals(value(), v.cumulate(ADD));
-        assertEquals(value(1, 3, 6, 10), v1234.cumulate(ADD));
-        assertEquals(value(), v.cumulate(MULT));
-        assertEquals(value(1, 2, 6, 24), v1234.cumulate(MULT));
+        assertEquals(value(), v.cumulate(Value.ADD));
+        assertEquals(value(1, 3, 6, 10), v1234.cumulate(Value.ADD));
+        assertEquals(value(), v.cumulate(Value.MULT));
+        assertEquals(value(1, 2, 6, 24), v1234.cumulate(Value.MULT));
     }
 
     @Test
