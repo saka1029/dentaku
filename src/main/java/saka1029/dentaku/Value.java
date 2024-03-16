@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BinaryOperator;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,6 +32,10 @@ public class Value {
     static BigDecimal bool(boolean b) {
         return b ? BigDecimal.ONE : BigDecimal.ZERO;
     }
+
+    static boolean bool(BigDecimal d) {
+        return !d.equals(BigDecimal.ZERO);
+    }
     
     public static final BOP EQ = new BOP((l, r) -> bool(l.compareTo(r) == 0), BigDecimal.ZERO);
     public static final BOP NE = new BOP((l, r) -> bool(l.compareTo(r) != 0), BigDecimal.ZERO);
@@ -40,6 +43,11 @@ public class Value {
     public static final BOP LE = new BOP((l, r) -> bool(l.compareTo(r) <= 0), BigDecimal.ZERO);
     public static final BOP GT = new BOP((l, r) -> bool(l.compareTo(r) > 0), BigDecimal.ZERO);
     public static final BOP GE = new BOP((l, r) -> bool(l.compareTo(r) >= 0), BigDecimal.ZERO);
+
+    public static final UOP NOT = a -> a.equals(BigDecimal.ZERO) ? BigDecimal.ONE : BigDecimal.ZERO;
+    public static final BOP AND = new BOP((a, b) -> bool(bool(a) && bool(b)), BigDecimal.ONE);
+    public static final BOP OR = new BOP((a, b) -> bool(bool(a) || bool(b)), BigDecimal.ZERO);
+    public static final BOP XOR = new BOP((a, b) -> bool(bool(a) ^ bool(b)), BigDecimal.ZERO);
 
     private final BigDecimal[] elements;
 
@@ -81,7 +89,7 @@ public class Value {
     }
 
     public Value binary(BinaryOperator<BigDecimal> operator, Value right) {
-                if (elements.length == 1) 
+        if (elements.length == 1) 
             return new Value(Arrays.stream(right.elements) 
                 .map(e -> operator.apply(elements[0], e)) 
                 .toArray(BigDecimal[]::new)); 
