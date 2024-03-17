@@ -74,6 +74,10 @@ public class TestValue {
         assertEquals(value(10), v1234.reduce(Value.ADD));
         assertEquals(value(1), v.reduce(Value.MULT));
         assertEquals(value(24), v1234.reduce(Value.MULT));
+        assertEquals(value(1), v1234.reduce(Value.MIN));
+        assertEquals(value(4), v1234.reduce(Value.MAX));
+        assertEquals(Value.of(Value.MAX_VALUE), v.reduce(Value.MIN));
+        assertEquals(Value.of(Value.MIN_VALUE), v.reduce(Value.MAX));
     }
 
     @Test
@@ -137,11 +141,11 @@ public class TestValue {
     }
 
     @Test
-    public void testBinarySelect() {
-        assertEquals(value(1, 3), value(1, 0, 1, 0).select(value(1, 2, 3, 4)));
-        assertEquals(value(1, 3, 4), value(1, 0, 1, 1).select(value(1, 2, 3, 4)));
-        assertEquals(value(1, 2, 3, 4), value(1).select(value(1, 2, 3, 4)));
-        assertEquals(value(), value(0).select(value(1, 2, 3, 4)));
+    public void testBinaryFilter() {
+        assertEquals(value(1, 3), value(1, 0, 1, 0).filter(value(1, 2, 3, 4)));
+        assertEquals(value(1, 3, 4), value(1, 0, 1, 1).filter(value(1, 2, 3, 4)));
+        assertEquals(value(1, 2, 3, 4), value(1).filter(value(1, 2, 3, 4)));
+        assertEquals(value(), value(0).filter(value(1, 2, 3, 4)));
     }
 
 }

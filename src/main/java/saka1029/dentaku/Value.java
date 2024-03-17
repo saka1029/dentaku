@@ -13,6 +13,10 @@ public class Value {
     public static final MathContext MATH_CONTEXT = MathContext.DECIMAL64;
 
     public static final Value EMPTY = new Value();
+
+    public static final BigDecimal MIN_VALUE = new BigDecimal(-Double.MAX_VALUE);
+    public static final BigDecimal MAX_VALUE = new BigDecimal(Double.MAX_VALUE);
+
     public static final UOP NEG = BigDecimal::negate;
     public static final UOP SIGN = d -> new BigDecimal(d.signum());
     public static final UOP SIN = d -> new BigDecimal(Math.sin(d.doubleValue()), MATH_CONTEXT);
@@ -44,6 +48,8 @@ public class Value {
     public static final BOP LE = new BOP((l, r) -> bool(l.compareTo(r) <= 0), BigDecimal.ZERO);
     public static final BOP GT = new BOP((l, r) -> bool(l.compareTo(r) > 0), BigDecimal.ZERO);
     public static final BOP GE = new BOP((l, r) -> bool(l.compareTo(r) >= 0), BigDecimal.ZERO);
+    public static final BOP MIN = new BOP((l, r) -> l.min(r), MAX_VALUE);
+    public static final BOP MAX = new BOP((l, r) -> l.max(r), MIN_VALUE);
 
     public static final UOP NOT = a -> bool(!bool(a));
     public static final BOP AND = new BOP((a, b) -> bool(bool(a) && bool(b)), BigDecimal.ONE);
@@ -67,9 +73,11 @@ public class Value {
     }
 
     public Value reduce(BinaryOperator<BigDecimal> operator, BigDecimal unit) {
-        BigDecimal result = unit;
-        for (BigDecimal e : elements)
-            result = operator.apply(result, e);
+        if (elements.length <= 0)
+            return new Value(unit);
+        BigDecimal result = elements[0];
+        for (int i = 1; i < elements.length; ++i)
+            result = operator.apply(result, elements[i]);
         return new Value(result);
     }
 
@@ -110,7 +118,7 @@ public class Value {
         return binary(operator.operator(), right);
     }
 
-    public Value select(Value right) {
+    public Value filter(Value right) {
         if (elements.length == 1)
             return bool(elements[0]) ? right : EMPTY;
         else if (elements.length == right.elements.length) {
