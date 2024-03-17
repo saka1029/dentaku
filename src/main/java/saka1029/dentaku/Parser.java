@@ -6,6 +6,28 @@ import java.util.List;
 import saka1029.dentaku.Tokenizer.Token;
 import saka1029.dentaku.Tokenizer.Type;
 
+/**
+ * SYNTAX
+ * <pre>
+ * statement       = define-variable
+ *                 | define-unary
+ *                 | define-binary
+ *                 | expression
+ * define-variable = ID '=' expression
+ * define-unary    = ID ID '=' expression
+ * define-binary   = ID ID ID '=' expression
+ * expression      = unary { BOP unary }
+ * unary           = sequence
+ *                 | UOP unary
+ *                 | MOP UOP unary'
+ * sequence        = primary { primary }
+ * primary         = '(' expression ')'
+ *                 | ID
+ *                 | NUMBER { NUMBER }
+ * BOP             = ID | SPECIAL
+ * UOP             = ID | SPECIAL
+ * </pre>
+ */
 public class Parser {
     final Operators operators;
     final List<Token> tokens;

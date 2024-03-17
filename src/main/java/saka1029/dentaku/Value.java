@@ -56,6 +56,9 @@ public class Value implements Expression {
     public static final BOP OR = new BOP((a, b) -> bool(bool(a) || bool(b)), BigDecimal.ZERO);
     public static final BOP XOR = new BOP((a, b) -> bool(bool(a) ^ bool(b)), BigDecimal.ZERO);
 
+    public static final MOP REDUCE = Value::reduce;
+    public static final MOP CUMULATE = Value::cumulate;
+
     private final BigDecimal[] elements;
 
     Value(BigDecimal... elements) {

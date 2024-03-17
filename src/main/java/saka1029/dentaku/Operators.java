@@ -12,7 +12,7 @@ public class Operators {
 
     final Map<String, UOP> uops = new HashMap<>();
     final Map<String, BOP> bops = new HashMap<>();
-    final Map<String, MOP> mpos = new HashMap<>();
+    final Map<String, MOP> mops = new HashMap<>();
 
     public static Operators of() {
         Operators ops = new Operators();
@@ -74,5 +74,8 @@ public class Operators {
         ops.bops.put("and", Value.AND);
         ops.bops.put("or", Value.OR);
         ops.bops.put("xor", Value.XOR);
+        // meta operators
+        ops.mops.put("reduce", Value.REDUCE);
+        ops.mops.put("cumurate", Value.CUMULATE);
     }
 }
