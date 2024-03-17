@@ -9,9 +9,9 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Value {
+public class Value implements Expression {
     public static final MathContext MATH_CONTEXT = MathContext.DECIMAL64;
-
+    public static final Value NaN = new Value();
     public static final Value EMPTY = new Value();
 
     public static final BigDecimal MIN_VALUE = new BigDecimal(-Double.MAX_VALUE);
@@ -48,8 +48,8 @@ public class Value {
     public static final BOP LE = new BOP((l, r) -> bool(l.compareTo(r) <= 0), BigDecimal.ZERO);
     public static final BOP GT = new BOP((l, r) -> bool(l.compareTo(r) > 0), BigDecimal.ZERO);
     public static final BOP GE = new BOP((l, r) -> bool(l.compareTo(r) >= 0), BigDecimal.ZERO);
-    public static final BOP MIN = new BOP((l, r) -> l.min(r), MAX_VALUE);
-    public static final BOP MAX = new BOP((l, r) -> l.max(r), MIN_VALUE);
+    public static final BOP MIN = new BOP(BigDecimal::min, MAX_VALUE);
+    public static final BOP MAX = new BOP(BigDecimal::max, MIN_VALUE);
 
     public static final UOP NOT = a -> bool(!bool(a));
     public static final BOP AND = new BOP((a, b) -> bool(bool(a) && bool(b)), BigDecimal.ONE);
@@ -64,6 +64,19 @@ public class Value {
 
     public static Value of(BigDecimal... elements) {
         return new Value(elements.clone());
+    }
+
+    @Override
+    public Value eval(Context context) {
+        return this;
+    }
+
+    public Value append(Value right) {
+        int lSize = elements.length, rSize = right.elements.length;
+        BigDecimal[] n = new BigDecimal[lSize + rSize];
+        System.arraycopy(elements, 0, n, 0, lSize);
+        System.arraycopy(right.elements, 0, n, lSize, rSize);
+        return new Value(n);
     }
 
     public BigDecimal oneElement() {
