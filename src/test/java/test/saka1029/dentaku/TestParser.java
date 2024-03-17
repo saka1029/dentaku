@@ -44,5 +44,6 @@ public class TestParser {
         Context c = Context.of(ops);
         assertEquals(value(-1, -2, -3), eval(c, "- 1 2 3"));
         assertEquals(value(1, 2, 3), eval(c, "+ 1 2 3"));
+        assertEquals(value(1, -1, 0), eval(c, "sign 5 -2 0"));
     }
 }
