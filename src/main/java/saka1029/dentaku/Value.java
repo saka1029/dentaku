@@ -66,6 +66,12 @@ public class Value {
         return new Value(elements.clone());
     }
 
+    public BigDecimal oneElement() {
+        if (elements.length != 1)
+            throw new ValueException("One element expected bug %d", elements.length);
+        return elements[0];
+    }
+
     public Value map(UOP operator) {
         return new Value(Arrays.stream(elements)
             .map(e -> operator.apply(e))
