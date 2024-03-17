@@ -87,24 +87,29 @@ public class Tokenizer {
         sb.setLength(0);
     }
 
-    void appendCh() {
+    void append(int ch) {
         sb.appendCodePoint(ch);
+    }
+
+    void appendCh() {
+        append(ch);
         ch();
     }
 
+    Token numberOrSpecial() {
+        append('-');
+        return isDigit(ch) ? number() : special();
+    }
+
     Token id() {
-        clear();
-        do {
+        while (isIdRest(ch))
             appendCh();
-        } while (isIdRest(ch));
         return new Token(Type.ID, sb.toString());
     }
 
     Token special() {
-        clear();
-        do {
+        while (isSpecial(ch))
             appendCh();
-        } while (isSpecial(ch));
         return new Token(Type.SPECIAL, sb.toString());
     }
 
@@ -116,7 +121,6 @@ public class Tokenizer {
     }
 
     Token number() {
-        clear();
         digits();
         if (ch == '.') {
             appendCh();
@@ -134,12 +138,15 @@ public class Tokenizer {
     public Token get() {
         while (Character.isWhitespace(ch))
             ch();
+        clear();
         if (ch == -1)
             return END;
         else if (eat('('))
             return LP;
         else if (eat(')'))
             return RP;
+        else if (eat('-'))
+            return numberOrSpecial();
         else if (isIdFirst(ch))
             return id();
         else if (isSpecial(ch))
