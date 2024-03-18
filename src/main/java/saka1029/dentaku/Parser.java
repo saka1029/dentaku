@@ -132,20 +132,38 @@ public class Parser {
         return e;
     }
 
+    Unary unary(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.uops.get(token.string());
+    }
+
+    High high(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.hops.get(token.string());
+    }
+
+    Binary binary(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.bops.get(token.string());
+    }
+
     Expression unary() {
         High high;
         Unary unary;
-        if (is(token, Type.ID, Type.SPECIAL) && (high = functions.hops.get(token.string())) != null) {
-            String mopName = token.string();
+        if ((high = high(token)) != null) {
+            String highName = token.string();
             get();  // skip MOP
             Binary binary;
-            if (is(token, Type.ID, Type.SPECIAL) && (binary = functions.bops.get(token.string())) != null) {
+            if ((binary = binary(token)) != null) {
                 get();  // skip BOP
                 Expression e = unary();
                 return c -> high.apply(e.eval(c), binary);
             } else
-                throw new ValueException("BOP expected after '%s'", mopName);
-        } else if (is(token, Type.ID, Type.SPECIAL) && (unary = functions.uops.get(token.string())) != null) {
+                throw new ValueException("BOP expected after '%s'", highName);
+        } else if ((unary = unary(token)) != null) {
             get();  // skip UOP
             Expression e = unary();
             return c -> unary.apply(e.eval(c));
@@ -155,14 +173,12 @@ public class Parser {
 
     Expression expression() {
         Expression e = unary();
-        while (is(token, Type.ID, Type.SPECIAL)) {
-            Binary binary;
-            if ((binary = functions.bops.get(token.string())) != null) {
-                get();  // skip BOP
-                Expression left = e, right = unary();
-                e = c -> binary.apply(left.eval(c), right.eval(c));
-            } else
-                break;
+        Binary b;
+        while ((b = binary(token)) != null) {
+            get();  // skip BOP
+            Binary binary = b;
+            Expression left = e, right = unary();
+            e = c -> binary.apply(left.eval(c), right.eval(c));
         }
         return e;
     }

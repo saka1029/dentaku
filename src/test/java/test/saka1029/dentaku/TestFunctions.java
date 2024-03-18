@@ -27,6 +27,7 @@ public class TestFunctions {
         Context c = Context.of(f);
         assertEquals(value(-1, -2, -3), eval(c, "- 1 2 3"));
         assertEquals(value(6), eval(c, "+ 1 2 3"));
+        assertEquals(value(24), eval(c, "* 1 2 3 4"));
         assertEquals(value(-1, 1, 0), eval(c, "sign -1 2 0"));
         assertEquals(value(0, 1), eval(c, "not -1 0"));
     }
@@ -50,6 +51,12 @@ public class TestFunctions {
         assertEquals(value(8, 9, 10), eval(c, "8 .. 10"));
         assertEquals(value(8), eval(c, "8 .. 8"));
         assertEquals(value(10, 9, 8), eval(c, "10 .. 8"));
+        assertEquals(value(1, 4, 9, 16), eval(c, "1 .. 4 ^ 2"));
+        assertEquals(value(2, 4, 8, 16), eval(c, "2 ^ (1 .. 4)"));
+        assertEquals(value(1), eval(c, "1 min 4"));
+        assertEquals(value(1, 2, 1), eval(c, "1 2 3 min 3 2 1"));
+        assertEquals(value(4), eval(c, "1 max 4"));
+        assertEquals(value(3, 2, 3), eval(c, "1 2 3 max 3 2 1"));
         assertEquals(value(1, 3), eval(c, "1 0 1 0 filter (1 .. 4)"));
         assertEquals(Value.NaN, eval(c, "a = 1 .. 4"));
         assertEquals(value(0, 0, 1, 1), eval(c, "a > 2"));

@@ -56,7 +56,8 @@ public class Value implements Expression {
 
     public Value reduce(Binary operator) {
         if (elements.length <= 0)
-            throw new ValueException("Empty value");
+            return EMPTY;
+            // throw new ValueException("Empty value");
         Value result = Value.of(elements[0]);
         for (int i = 1; i < elements.length; ++i)
             result = operator.apply(result, Value.of(elements[i]));
