@@ -7,8 +7,11 @@ public class Context {
     final Functions functions;
     final Map<String, Expression> variables = new HashMap<>();
 
+
     private Context(Functions functions) {
         this.functions = functions;
+        variables.put("PI", c -> Value.PI);
+        variables.put("E", c -> Value.E);
     }
 
     public static Context of(Functions functions) {

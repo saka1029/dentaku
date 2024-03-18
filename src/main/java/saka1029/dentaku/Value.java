@@ -14,6 +14,9 @@ public class Value implements Expression {
     public static final MathContext MATH_CONTEXT = MathContext.DECIMAL64;
     public static final Value NaN = new Value();
     public static final Value EMPTY = new Value();
+    public static final Value PI = Value.of(new BigDecimal("3.1415926535897932384626433"));
+    public static final Value E = Value.of(new BigDecimal("2.7182818284590452353602874"));
+    public static final BigDecimal EPSILON = new BigDecimal(5e-10);
 
     private final BigDecimal[] elements;
 

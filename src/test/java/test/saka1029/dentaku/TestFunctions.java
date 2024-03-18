@@ -28,6 +28,14 @@ public class TestFunctions {
         assertEquals(value(-1, -2, -3), eval(c, "- 1 2 3"));
         assertEquals(value(6), eval(c, "+ 1 2 3"));
         assertEquals(value(24), eval(c, "* 1 2 3 4"));
+        assertEquals(value(1, 1, 1, 1), eval(c, "sin 0 (PI / 2) (-PI / 2) PI ~ 0 1 -1 0"));
+        assertEquals(value(1, 1, 1, 1), eval(c, "cos 0 (PI / 2) (-PI / 2) PI ~ 1 0 0 -1"));
+        assertEquals(value(1, 1, 1, 1), eval(c, "tan 0 (PI / 4) (-PI / 4) PI ~ 0 1 -1 0"));
+        assertEquals(value(1, 1, 1, 1), eval(c, "asin 0 1 -1 0 ~ 0 (PI / 2) (-PI / 2) 0"));
+        assertEquals(value(1, 1, 1, 1), eval(c, "acos 1 0 0 -1 ~ 0 (PI / 2) (PI / 2) PI"));
+        assertEquals(value(1, 1, 1, 1), eval(c, "atan 0 1 -1 0 ~ 0 (PI / 4) (-PI / 4) 0"));
+        assertEquals(value(0, 1, 2, 3), eval(c, "log (E ^ (0 .. 3))"));
+        assertEquals(value(0, 1, 2, 3), eval(c, "log10 (10 ^ (0 .. 3))"));
         assertEquals(value(-1, 1, 0), eval(c, "sign -1 2 0"));
         assertEquals(value(0, 1), eval(c, "not -1 0"));
     }
@@ -95,5 +103,9 @@ public class TestFunctions {
         assertEquals(value(55), eval(c, "+ (1 .. 10)"));
         assertEquals(value(1, 3, 6, 10), eval(c, "@@ + (1 .. 4)"));
         assertEquals(value(1, 2, 6, 24, 120), eval(c, "@@ * (1 .. 5)"));
+        assertEquals(value(-2), eval(c, "@ min 1 3 9 -2 0"));
+        assertEquals(value(1, 1, 1, -2, -2), eval(c, "@@ min 1 3 9 -2 0"));
+        assertEquals(value(9), eval(c, "@ max 1 3 9 -2 0"));
+        assertEquals(value(1, 3, 9, 9, 9), eval(c, "@@ max 1 3 9 -2 0"));
     }
 }
