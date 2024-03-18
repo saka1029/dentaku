@@ -14,6 +14,7 @@ import java.util.Set;
  * SP      = '!' | '$' | '%' | '&' | '-'
  *         | '=' | '^' | '~' | '|' | '@'
  *         | '+' | '*' | '<' | '>' | '/'
+ *         | '.'
  * NUMBER  = [ '-' ] DIGITS
  *           [ '.' DIGITS]
  *           [ ( 'e' | 'E') [ '+' | '-' ] DIGITS ]
@@ -79,7 +80,8 @@ public class Tokenizer {
     static final Set<Integer> SPECIALS = Set.of(
         (int)'!', (int)'$', (int)'%', (int)'&', (int)'-',
         (int)'=', (int)'^', (int)'~', (int)'|', (int)'@',
-        (int)'+', (int)'*', (int)'<', (int)'>', (int)'/'
+        (int)'+', (int)'*', (int)'<', (int)'>', (int)'/',
+        (int)'.'
     );
 
     static boolean isSpecial(int ch) {

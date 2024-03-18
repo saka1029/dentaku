@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BinaryOperator;
 
 public class Operators {
     public static final MathContext MATH_CONTEXT = MathContext.DECIMAL64;
@@ -13,6 +14,7 @@ public class Operators {
     final Map<String, UOP> uops = new HashMap<>();
     final Map<String, BOP> bops = new HashMap<>();
     final Map<String, MOP> mops = new HashMap<>();
+    final Map<String, BinaryOperator<Value>> bins = new HashMap<>();
 
     public static Operators of() {
         Operators ops = new Operators();
@@ -38,10 +40,6 @@ public class Operators {
 
     static int i(BigDecimal d) {
         return d.intValue();
-    }
-
-    static double d(BigDecimal d) {
-        return d.doubleValue();
     }
 
     static void initialize(Operators ops) {
@@ -75,7 +73,7 @@ public class Operators {
         ops.bops.put("or", Value.OR);
         ops.bops.put("xor", Value.XOR);
         // meta operators
-        ops.mops.put("reduce", Value.REDUCE);
-        ops.mops.put("cumurate", Value.CUMULATE);
+        ops.mops.put("@", Value.REDUCE);
+        ops.bins.put("..", Value::to);
     }
 }

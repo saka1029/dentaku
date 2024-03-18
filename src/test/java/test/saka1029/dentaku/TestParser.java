@@ -46,4 +46,38 @@ public class TestParser {
         assertEquals(value(1, 2, 3), eval(c, "+ 1 2 3"));
         assertEquals(value(1, -1, 0), eval(c, "sign 5 -2 0"));
     }
+
+    @Test
+    public void testDefineVariable() {
+        Operators ops = Operators.of();
+        Context c = Context.of(ops);
+        assertEquals(Value.NaN, eval(c, "a = 1 2 3"));
+        assertEquals(value(1, 2, 3), eval(c, "a"));
+        assertEquals(Value.NaN, eval(c, "a = (1 2 3)"));
+        assertEquals(value(1, 2, 3), eval(c, "a"));
+        assertEquals(Value.NaN, eval(c, "a = - 1 2 3"));
+        assertEquals(value(-1, -2, -3), eval(c, "a"));
+        assertEquals(Value.NaN, eval(c, "b = a + 1"));
+        assertEquals(value(0, -1, -2), eval(c, "b"));
+        assertEquals(Value.NaN, eval(c, "a = 3"));
+        assertEquals(value(4), eval(c, "b"));
+    }
+
+    @Test
+    public void testMOP() {
+        Operators ops = Operators.of();
+        Context c = Context.of(ops);
+        assertEquals(value(6), eval(c, "@ + 1 2 3"));
+        assertEquals(value(1, 3, 6), eval(c, "@@ + 1 2 3"));
+        assertEquals(value(24), eval(c, "@ * 1 2 3 4"));
+        assertEquals(value(1, 2, 6, 24), eval(c, "@@ * 1 2 3 4"));
+    }
+
+    @Test
+    public void testTo() {
+        Operators ops = Operators.of();
+        Context c = Context.of(ops);
+        assertEquals(value(3, 4, 5), eval(c, "3 .. 5"));
+        assertEquals(value(5, 4, 3), eval(c, "5 .. 3"));
+    }
 }

@@ -3,6 +3,7 @@ package saka1029.dentaku;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BinaryOperator;
 import saka1029.dentaku.Tokenizer.Token;
 import saka1029.dentaku.Tokenizer.Type;
 
@@ -75,6 +76,7 @@ public class Parser {
             throw new ValueException("ID expected but '%s'", token.string());
         String name = token.string();
         get(); // skip ID
+        get(); // skip '='
         Expression e = expression();
         return c -> { c.variable(name, e); return Value.NaN; };
     }
@@ -97,6 +99,7 @@ public class Parser {
             get(); // skip ')'
         } else if (is(token, Type.ID)) {
             e = Variable.of(token.string());
+            get(); // ski ID
         } else if (is(token, Type.NUMBER)) {
             List<BigDecimal> elements = new ArrayList<>();
             do {
@@ -119,8 +122,19 @@ public class Parser {
     }
 
     Expression unary() {
+        MOP mop;
         UOP uop;
-        if (is(token, Type.ID, Type.SPECIAL) && (uop = operators.uops.get(token.string())) != null) {
+        if (is(token, Type.ID, Type.SPECIAL) && (mop = operators.mops.get(token.string())) != null) {
+            String mopName = token.string();
+            get();  // skip MOP
+            BOP bop;
+            if (is(token, Type.ID, Type.SPECIAL) && (bop = operators.bops.get(token.string())) != null) {
+                get();  // skip BOP
+                Expression e = unary();
+                return c -> mop.apply(e.eval(c), bop);
+            } else
+                throw new ValueException("BOP expected after '%s'", mopName);
+        } else if (is(token, Type.ID, Type.SPECIAL) && (uop = operators.uops.get(token.string())) != null) {
             get();  // skip UOP
             Expression e = unary();
             return c -> e.eval(c).map(uop);
@@ -131,12 +145,18 @@ public class Parser {
     Expression expression() {
         Expression e = unary();
         while (is(token, Type.ID, Type.SPECIAL)) {
-            BOP bop = operators.bops.get(token.string());
-            if (bop == null)
+            BinaryOperator<Value> bin;
+            BOP bop;
+            if ((bin = operators.bins.get(token.string())) != null) {
+                get();  // skip BIN
+                Expression left = e, right = expression();
+                return c -> bin.apply(left.eval(c), right.eval(c));
+            } else if ((bop = operators.bops.get(token.string())) != null) {
+                get();  // skip BOP
+                Expression left = e, right = expression();
+                return c -> left.eval(c).binary(bop, right.eval(c));
+            } else
                 break;
-            get();  // skip BOP
-            Expression left = e, right = expression();
-            return c -> left.eval(c).binary(bop, right.eval(c));
         }
         return e;
     }

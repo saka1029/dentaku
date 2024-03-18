@@ -65,6 +65,10 @@ public class Value implements Expression {
         this.elements = elements;
     }
 
+    Value(List<BigDecimal> list) {
+        this.elements = list.toArray(BigDecimal[]::new);
+    }
+
     public static Value of(BigDecimal... elements) {
         return new Value(elements.clone());
     }
@@ -84,7 +88,7 @@ public class Value implements Expression {
 
     public BigDecimal oneElement() {
         if (elements.length != 1)
-            throw new ValueException("One element expected bug %d", elements.length);
+            throw new ValueException("One element expected but '%s'", this);
         return elements[0];
     }
 
@@ -103,6 +107,15 @@ public class Value implements Expression {
         return new Value(result);
     }
 
+    public Value reduce(Binary operator) {
+        if (elements.length <= 0)
+            throw new ValueException("Empty value");
+        Value result = Value.of(elements[0]);
+        for (int i = 1; i < elements.length; ++i)
+            result = operator.apply(result, Value.of(elements[i]));
+        return result;
+    }
+
     public Value reduce(BOP operator) {
         return reduce(operator.operator(), operator.unit());
     }
@@ -113,6 +126,16 @@ public class Value implements Expression {
         for (BigDecimal e : elements)
             result.add(temp = operator.apply(temp, e));
         return new Value(result.toArray(BigDecimal[]::new));
+    }
+
+    public Value cumulate(Binary operator) {
+        if (elements.length <= 0)
+            throw new ValueException("Empty value");
+        Value v = Value.of(elements[0]);
+        Value result = v;
+        for (int i = 1; i < elements.length; ++i)
+            result = result.append(v = operator.apply(v, Value.of(elements[i])));
+        return result;
     }
 
     public Value cumulate(BOP operator) {
@@ -138,6 +161,19 @@ public class Value implements Expression {
 
     public Value binary(BOP operator, Value right) {
         return binary(operator.operator(), right);
+    }
+
+    public Value to(Value right) {
+        BigDecimal start = this.oneElement();
+        BigDecimal end = right.oneElement();
+        List<BigDecimal> list = new ArrayList<>();
+        if (start.compareTo(end) <= 0)
+            for (BigDecimal i = start; i.compareTo(end) <= 0; i = i.add(BigDecimal.ONE))
+                list.add(i);
+        else
+            for (BigDecimal i = start; i.compareTo(end) >= 0; i = i.subtract(BigDecimal.ONE))
+                list.add(i);
+        return new Value(list);
     }
 
     public Value filter(Value right) {
