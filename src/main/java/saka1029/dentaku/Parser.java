@@ -3,7 +3,6 @@ package saka1029.dentaku;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BinaryOperator;
 import saka1029.dentaku.Tokenizer.Token;
 import saka1029.dentaku.Tokenizer.Type;
 
@@ -30,25 +29,28 @@ import saka1029.dentaku.Tokenizer.Type;
  * </pre>
  */
 public class Parser {
-    final Operators operators;
+    final Functions functions;
     final List<Token> tokens;
     int index;
     Token token;
 
-    private Parser(Operators operators, String input) {
-        this.operators = operators;
+    private Parser(Functions functions, String input) {
+        this.functions = functions;
         this.tokens = Tokenizer.tokens(input);
         this.index = 0;
         get();
     }
 
-    public static Parser of(Operators operators, String input) {
-        return new Parser(operators, input);
+    public static Parser of(Functions functions, String input) {
+        return new Parser(functions, input);
     }
 
-    public static Expression parse(Operators operators, String input) {
-        Parser parser = of(operators, input);
-        return parser.statement();
+    public static Expression parse(Functions functions, String input) {
+        Parser parser = of(functions, input);
+        Expression result = parser.statement();
+        if (parser.token.type() != Type.END)
+            throw new ValueException("Extra tokens '%s'", parser.token.string());
+        return result;
     }
 
     Token get() {
@@ -112,9 +114,18 @@ public class Parser {
         return e;
     }
 
+    boolean isPrimary(Token token) {
+        String s = token.string();
+        return is(token, Type.LP, Type.NUMBER)
+            || is(token, Type.ID)
+                && !functions.uops.containsKey(s)
+                && !functions.bops.containsKey(s)
+                && !functions.hops.containsKey(s);
+    }
+
     Expression sequence() {
         Expression e = primary();
-        while (is(token, Type.LP, Type.ID, Type.NUMBER)) {
+        while (isPrimary(token)) {
             Expression left = e, right = primary();
             e = c -> left.eval(c).append(right.eval(c));
         }
@@ -122,22 +133,22 @@ public class Parser {
     }
 
     Expression unary() {
-        MOP mop;
-        UOP uop;
-        if (is(token, Type.ID, Type.SPECIAL) && (mop = operators.mops.get(token.string())) != null) {
+        High high;
+        Unary unary;
+        if (is(token, Type.ID, Type.SPECIAL) && (high = functions.hops.get(token.string())) != null) {
             String mopName = token.string();
             get();  // skip MOP
-            BOP bop;
-            if (is(token, Type.ID, Type.SPECIAL) && (bop = operators.bops.get(token.string())) != null) {
+            Binary binary;
+            if (is(token, Type.ID, Type.SPECIAL) && (binary = functions.bops.get(token.string())) != null) {
                 get();  // skip BOP
                 Expression e = unary();
-                return c -> mop.apply(e.eval(c), bop);
+                return c -> high.apply(e.eval(c), binary);
             } else
                 throw new ValueException("BOP expected after '%s'", mopName);
-        } else if (is(token, Type.ID, Type.SPECIAL) && (uop = operators.uops.get(token.string())) != null) {
+        } else if (is(token, Type.ID, Type.SPECIAL) && (unary = functions.uops.get(token.string())) != null) {
             get();  // skip UOP
             Expression e = unary();
-            return c -> e.eval(c).map(uop);
+            return c -> unary.apply(e.eval(c));
         } else
             return sequence();
     }
@@ -145,16 +156,11 @@ public class Parser {
     Expression expression() {
         Expression e = unary();
         while (is(token, Type.ID, Type.SPECIAL)) {
-            BinaryOperator<Value> bin;
-            BOP bop;
-            if ((bin = operators.bins.get(token.string())) != null) {
-                get();  // skip BIN
-                Expression left = e, right = expression();
-                return c -> bin.apply(left.eval(c), right.eval(c));
-            } else if ((bop = operators.bops.get(token.string())) != null) {
+            Binary binary;
+            if ((binary = functions.bops.get(token.string())) != null) {
                 get();  // skip BOP
-                Expression left = e, right = expression();
-                return c -> left.eval(c).binary(bop, right.eval(c));
+                Expression left = e, right = unary();
+                e = c -> binary.apply(left.eval(c), right.eval(c));
             } else
                 break;
         }

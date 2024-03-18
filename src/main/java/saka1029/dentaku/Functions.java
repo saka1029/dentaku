@@ -16,6 +16,10 @@ public class Functions {
         initialize();
     }
 
+    public static Functions of() {
+        return new Functions();
+    }
+
     static BigDecimal dec(boolean b) {
         return b ? BigDecimal.ONE : BigDecimal.ZERO;
     }
@@ -39,7 +43,8 @@ public class Functions {
     void initialize() {
         // unary operators
         uops.put("-", v -> v.map(BigDecimal::negate));
-        uops.put("+", v -> v);
+        uops.put("+", v -> v.reduce((l, r) -> l.binary(BigDecimal::add, r)));
+        uops.put("*", v -> v.reduce((l, r) -> l.binary(BigDecimal::multiply, r)));
         uops.put("sign", v -> v.map(x -> dec(x.signum())));
         uops.put("sin", v -> v.map(x -> dec(Math.sin(d(x)))));
         uops.put("asin", v -> v.map(x -> dec(Math.asin(d(x)))));
@@ -66,7 +71,8 @@ public class Functions {
         bops.put("and", (l, r) -> l.binary((a, b) -> dec(b(a) & b(b)), r));
         bops.put("or", (l, r) -> l.binary((a, b) -> dec(b(a) | b(b)), r));
         bops.put("xor", (l, r) -> l.binary((a, b) -> dec(b(a) ^ b(b)), r));
-        bops.put("to", Value::to);
+        bops.put("filter", Value::filter);
+        bops.put("..", Value::to);
         // high order operations
         hops.put("@", Value::reduce);
         hops.put("@@", Value::cumulate);
