@@ -16,6 +16,30 @@ public class Functions {
         initialize();
     }
 
+    public Unary unary(String name) {
+        return uops.get(name);
+    }
+
+    public void unary(String name, Unary value) {
+        uops.put(name, value);
+    }
+
+    public Binary binary(String name) {
+        return bops.get(name);
+    }
+
+    public void binary(String name, Binary value) {
+        bops.put(name, value);
+    }
+
+    public High high(String name) {
+        return hops.get(name);
+    }
+
+    public void high(String name, High value) {
+        hops.put(name, value);
+    }
+
     static BigDecimal dec(boolean b) {
         return b ? BigDecimal.ONE : BigDecimal.ZERO;
     }
