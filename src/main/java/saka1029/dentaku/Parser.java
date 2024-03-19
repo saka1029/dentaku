@@ -14,18 +14,16 @@ import saka1029.dentaku.Tokenizer.Type;
  *                 | define-binary
  *                 | expression
  * define-variable = ID '=' expression
- * define-unary    = ID ID '=' expression
- * define-binary   = ID ID ID '=' expression
+ * define-unary    = IDSPECIAL ID '=' expression
+ * define-binary   = ID IDSPECIAL ID '=' expression
  * expression      = unary { BOP unary }
  * unary           = sequence
  *                 | UOP unary
  *                 | MOP UOP unary'
  * sequence        = primary { primary }
  * primary         = '(' expression ')'
- *                 | ID
+ *                 | VAR
  *                 | NUMBER { NUMBER }
- * BOP             = ID | SPECIAL
- * UOP             = ID | SPECIAL
  * </pre>
  */
 public class Parser {
@@ -73,6 +71,24 @@ public class Parser {
         return token.string().equals(string);
     }
 
+    Unary unary(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.uops.get(token.string());
+    }
+
+    Binary binary(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.bops.get(token.string());
+    }
+
+    High high(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.hops.get(token.string());
+    }
+
     Expression defineVariable() {
         if (!is(token, Type.ID))
             throw new ValueException("ID expected but '%s'", token.string());
@@ -103,24 +119,23 @@ public class Parser {
             e = Variable.of(token.string());
             get(); // ski ID
         } else if (is(token, Type.NUMBER)) {
-            List<BigDecimal> elements = new ArrayList<>();
+            List<BigDecimal> list = new ArrayList<>();
             do {
-                elements.add(token.number());
+                list.add(token.number());
                 get(); // skip NUMBER
             } while (is(token, Type.NUMBER));
-            e = Value.of(elements.toArray(BigDecimal[]::new));
+            e = Value.of(list);
         } else
             throw new ValueException("Unknown token '%s'", token.string());
         return e;
     }
 
     boolean isPrimary(Token token) {
-        String s = token.string();
         return is(token, Type.LP, Type.NUMBER)
             || is(token, Type.ID)
-                && !functions.uops.containsKey(s)
-                && !functions.bops.containsKey(s)
-                && !functions.hops.containsKey(s);
+                && unary(token) == null
+                && binary(token) == null
+                && high(token) == null;
     }
 
     Expression sequence() {
@@ -130,24 +145,6 @@ public class Parser {
             e = c -> left.eval(c).append(right.eval(c));
         }
         return e;
-    }
-
-    Unary unary(Token token) {
-        if (!is(token, Type.ID, Type.SPECIAL))
-            return null;
-        return functions.uops.get(token.string());
-    }
-
-    High high(Token token) {
-        if (!is(token, Type.ID, Type.SPECIAL))
-            return null;
-        return functions.hops.get(token.string());
-    }
-
-    Binary binary(Token token) {
-        if (!is(token, Type.ID, Type.SPECIAL))
-            return null;
-        return functions.bops.get(token.string());
     }
 
     Expression unary() {

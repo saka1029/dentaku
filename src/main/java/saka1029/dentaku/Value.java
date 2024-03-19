@@ -32,6 +32,10 @@ public class Value implements Expression {
         return new Value(elements.clone());
     }
 
+    public static Value of(List<BigDecimal> list) {
+        return new Value(list.toArray(BigDecimal[]::new));
+    }
+
     @Override
     public Value eval(Context context) {
         return this;
