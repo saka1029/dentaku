@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import org.junit.Test;
 import saka1029.dentaku.Context;
-import saka1029.dentaku.Operators;
+import saka1029.dentaku.Functions;
 import saka1029.dentaku.Parser;
 import saka1029.dentaku.Value;
 
@@ -18,12 +18,12 @@ public class TestParser {
     }
 
     static Value eval(Context context, String input) {
-        return Parser.parse(context.operators(), input).eval(context);
+        return Parser.parse(context.functions(), input).eval(context);
     }
 
     @Test
     public void testNumber() {
-        Operators ops = Operators.of();
+        Functions ops = Functions.of();
         Context c = Context.of(ops);
         assertEquals(value(1), eval(c, "  1 "));
         assertEquals(value(1, 2), eval(c, "  1   2 "));
@@ -31,7 +31,7 @@ public class TestParser {
 
     @Test
     public void testBinary() {
-        Operators ops = Operators.of();
+        Functions ops = Functions.of();
         Context c = Context.of(ops);
         assertEquals(value(3), eval(c, "  1  + 2"));
         assertEquals(value(4, 6), eval(c, "1 2 + 3 4"));
@@ -40,16 +40,17 @@ public class TestParser {
 
     @Test
     public void testUnary() {
-        Operators ops = Operators.of();
+        Functions ops = Functions.of();
         Context c = Context.of(ops);
-        assertEquals(value(-1, -2, -3), eval(c, "- 1 2 3"));
-        assertEquals(value(1, 2, 3), eval(c, "+ 1 2 3"));
+        assertEquals(value(-1, -2, -3, -4), eval(c, "- 1 2 3 4"));
+        assertEquals(value(10), eval(c, "+ 1 2 3 4"));
+        assertEquals(value(24), eval(c, "* 1 2 3 4"));
         assertEquals(value(1, -1, 0), eval(c, "sign 5 -2 0"));
     }
 
     @Test
     public void testDefineVariable() {
-        Operators ops = Operators.of();
+        Functions ops = Functions.of();
         Context c = Context.of(ops);
         assertEquals(Value.NaN, eval(c, "a = 1 2 3"));
         assertEquals(value(1, 2, 3), eval(c, "a"));
@@ -64,8 +65,8 @@ public class TestParser {
     }
 
     @Test
-    public void testMOP() {
-        Operators ops = Operators.of();
+    public void testHighOperator() {
+        Functions ops = Functions.of();
         Context c = Context.of(ops);
         assertEquals(value(6), eval(c, "@ + 1 2 3"));
         assertEquals(value(1, 3, 6), eval(c, "@@ + 1 2 3"));
@@ -75,7 +76,7 @@ public class TestParser {
 
     @Test
     public void testTo() {
-        Operators ops = Operators.of();
+        Functions ops = Functions.of();
         Context c = Context.of(ops);
         assertEquals(value(3, 4, 5), eval(c, "3 .. 5"));
         assertEquals(value(5, 4, 3), eval(c, "5 .. 3"));

@@ -4,19 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Context {
-    final Operators operators;
+    final Functions functions;
     final Map<String, Expression> variables = new HashMap<>();
 
-    private Context(Operators operators) {
-        this.operators = operators;
+
+    private Context(Functions functions) {
+        this.functions = functions;
+        variables.put("PI", c -> Value.PI);
+        variables.put("E", c -> Value.E);
     }
 
-    public static Context of(Operators operators) {
-        return new Context(operators);
+    public static Context of(Functions functions) {
+        return new Context(functions);
     }
 
-    public Operators operators() {
-        return operators;
+    public Functions functions() {
+        return functions;
     }
 
     public Expression variable(String name) {

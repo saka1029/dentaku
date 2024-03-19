@@ -3,7 +3,6 @@ package saka1029.dentaku;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BinaryOperator;
 import saka1029.dentaku.Tokenizer.Token;
 import saka1029.dentaku.Tokenizer.Type;
 
@@ -15,40 +14,41 @@ import saka1029.dentaku.Tokenizer.Type;
  *                 | define-binary
  *                 | expression
  * define-variable = ID '=' expression
- * define-unary    = ID ID '=' expression
- * define-binary   = ID ID ID '=' expression
+ * define-unary    = IDSPECIAL ID '=' expression
+ * define-binary   = ID IDSPECIAL ID '=' expression
  * expression      = unary { BOP unary }
  * unary           = sequence
  *                 | UOP unary
  *                 | MOP UOP unary'
  * sequence        = primary { primary }
  * primary         = '(' expression ')'
- *                 | ID
+ *                 | VAR
  *                 | NUMBER { NUMBER }
- * BOP             = ID | SPECIAL
- * UOP             = ID | SPECIAL
  * </pre>
  */
 public class Parser {
-    final Operators operators;
+    final Functions functions;
     final List<Token> tokens;
     int index;
     Token token;
 
-    private Parser(Operators operators, String input) {
-        this.operators = operators;
+    private Parser(Functions functions, String input) {
+        this.functions = functions;
         this.tokens = Tokenizer.tokens(input);
         this.index = 0;
         get();
     }
 
-    public static Parser of(Operators operators, String input) {
-        return new Parser(operators, input);
+    public static Parser of(Functions functions, String input) {
+        return new Parser(functions, input);
     }
 
-    public static Expression parse(Operators operators, String input) {
-        Parser parser = of(operators, input);
-        return parser.statement();
+    public static Expression parse(Functions functions, String input) {
+        Parser parser = of(functions, input);
+        Expression result = parser.statement();
+        if (parser.token.type() != Type.END)
+            throw new ValueException("Extra tokens '%s'", parser.token.string());
+        return result;
     }
 
     Token get() {
@@ -69,6 +69,24 @@ public class Parser {
 
     boolean is(Token token, String string) {
         return token.string().equals(string);
+    }
+
+    Unary unary(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.uops.get(token.string());
+    }
+
+    Binary binary(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.bops.get(token.string());
+    }
+
+    High high(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return functions.hops.get(token.string());
     }
 
     Expression defineVariable() {
@@ -101,20 +119,28 @@ public class Parser {
             e = Variable.of(token.string());
             get(); // ski ID
         } else if (is(token, Type.NUMBER)) {
-            List<BigDecimal> elements = new ArrayList<>();
+            List<BigDecimal> list = new ArrayList<>();
             do {
-                elements.add(token.number());
+                list.add(token.number());
                 get(); // skip NUMBER
             } while (is(token, Type.NUMBER));
-            e = Value.of(elements.toArray(BigDecimal[]::new));
+            e = Value.of(list);
         } else
             throw new ValueException("Unknown token '%s'", token.string());
         return e;
     }
 
+    boolean isPrimary(Token token) {
+        return is(token, Type.LP, Type.NUMBER)
+            || is(token, Type.ID)
+                && unary(token) == null
+                && binary(token) == null
+                && high(token) == null;
+    }
+
     Expression sequence() {
         Expression e = primary();
-        while (is(token, Type.LP, Type.ID, Type.NUMBER)) {
+        while (isPrimary(token)) {
             Expression left = e, right = primary();
             e = c -> left.eval(c).append(right.eval(c));
         }
@@ -122,41 +148,34 @@ public class Parser {
     }
 
     Expression unary() {
-        MOP mop;
-        UOP uop;
-        if (is(token, Type.ID, Type.SPECIAL) && (mop = operators.mops.get(token.string())) != null) {
-            String mopName = token.string();
+        High high;
+        Unary unary;
+        if ((high = high(token)) != null) {
+            String highName = token.string();
             get();  // skip MOP
-            BOP bop;
-            if (is(token, Type.ID, Type.SPECIAL) && (bop = operators.bops.get(token.string())) != null) {
+            Binary binary;
+            if ((binary = binary(token)) != null) {
                 get();  // skip BOP
                 Expression e = unary();
-                return c -> mop.apply(e.eval(c), bop);
+                return c -> high.apply(e.eval(c), binary);
             } else
-                throw new ValueException("BOP expected after '%s'", mopName);
-        } else if (is(token, Type.ID, Type.SPECIAL) && (uop = operators.uops.get(token.string())) != null) {
+                throw new ValueException("BOP expected after '%s'", highName);
+        } else if ((unary = unary(token)) != null) {
             get();  // skip UOP
             Expression e = unary();
-            return c -> e.eval(c).map(uop);
+            return c -> unary.apply(e.eval(c));
         } else
             return sequence();
     }
 
     Expression expression() {
         Expression e = unary();
-        while (is(token, Type.ID, Type.SPECIAL)) {
-            BinaryOperator<Value> bin;
-            BOP bop;
-            if ((bin = operators.bins.get(token.string())) != null) {
-                get();  // skip BIN
-                Expression left = e, right = expression();
-                return c -> bin.apply(left.eval(c), right.eval(c));
-            } else if ((bop = operators.bops.get(token.string())) != null) {
-                get();  // skip BOP
-                Expression left = e, right = expression();
-                return c -> left.eval(c).binary(bop, right.eval(c));
-            } else
-                break;
+        Binary b;
+        while ((b = binary(token)) != null) {
+            get();  // skip BOP
+            Binary binary = b;
+            Expression left = e, right = unary();
+            e = c -> binary.apply(left.eval(c), right.eval(c));
         }
         return e;
     }
