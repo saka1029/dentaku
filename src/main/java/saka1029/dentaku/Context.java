@@ -4,18 +4,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Context {
+    final Context parent;
     final Functions functions;
     final Map<String, Expression> variables = new HashMap<>();
 
-
-    private Context(Functions functions) {
+    private Context(Functions functions, Context parent) {
+        this.parent = parent;
         this.functions = functions;
-        variables.put("PI", c -> Value.PI);
-        variables.put("E", c -> Value.E);
     }
 
     public static Context of(Functions functions) {
-        return new Context(functions);
+        Context context = new Context(functions, null);
+        context.variables.put("PI", c -> Value.PI);
+        context.variables.put("E", c -> Value.E);
+        return context;
+    }
+
+    public Context child() {
+        return new Context(functions, this);
     }
 
     public Functions functions() {
@@ -23,7 +29,8 @@ public class Context {
     }
 
     public Expression variable(String name) {
-        return variables.get(name);
+        Expression e = variables.get(name);
+        return e != null ? e : parent != null ? parent.variable(name) : null;
     }
 
     public void variable(String name, Expression e) {

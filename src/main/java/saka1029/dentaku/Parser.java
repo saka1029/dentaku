@@ -74,25 +74,37 @@ public class Parser {
     Unary unary(Token token) {
         if (!is(token, Type.ID, Type.SPECIAL))
             return null;
-        return functions.uops.get(token.string());
+        return functions.unary(token.string());
     }
 
     Binary binary(Token token) {
         if (!is(token, Type.ID, Type.SPECIAL))
             return null;
-        return functions.bops.get(token.string());
+        return functions.binary(token.string());
     }
 
     High high(Token token) {
         if (!is(token, Type.ID, Type.SPECIAL))
             return null;
-        return functions.hops.get(token.string());
+        return functions.high(token.string());
+    }
+
+    String id(Token token) {
+        if (!is(token, Type.ID))
+            return null;
+        return token.string();
+    }
+
+    String idSpecial(Token token) {
+        if (!is(token, Type.ID, Type.SPECIAL))
+            return null;
+        return token.string();
     }
 
     Expression defineVariable() {
-        if (!is(token, Type.ID))
+        String name = id(token);
+        if (name == null)
             throw new ValueException("ID expected but '%s'", token.string());
-        String name = token.string();
         get(); // skip ID
         get(); // skip '='
         Expression e = expression();
@@ -100,6 +112,15 @@ public class Parser {
     }
 
     Expression defineUnary() {
+        String operator = idSpecial(token);
+        if (operator == null)
+            throw new ValueException("ID or SPECIAL expected but '%s'", token.string());
+        get(); // skip operator
+        String variable = id(token);
+        if (variable == null)
+            throw new ValueException("ID expected but '%s'", token.string());
+        get(); // skip variable
+        get(); // skip '='
         return null;
     }
 

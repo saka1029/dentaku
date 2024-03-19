@@ -16,6 +16,10 @@ public class Functions {
         initialize();
     }
 
+    public static Functions of() {
+        return new Functions();
+    }
+
     public Unary unary(String name) {
         return uops.get(name);
     }
