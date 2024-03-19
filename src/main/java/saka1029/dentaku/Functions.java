@@ -66,6 +66,7 @@ public class Functions {
 
     void initialize() {
         // unary operators
+        uops.put("length", (c, v) -> Value.of(dec(v.size())));
         uops.put("-", (c, v) -> v.map(BigDecimal::negate));
         uops.put("+", (c, v) -> v.reduce(c, (c1, l, r) -> l.binary(BigDecimal::add, r)));
         uops.put("*", (c, v) -> v.reduce(c, (c1, l, r) -> l.binary(BigDecimal::multiply, r)));

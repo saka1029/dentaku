@@ -121,11 +121,27 @@ public class Parser {
             throw new ValueException("ID expected but '%s'", token.string());
         get(); // skip variable
         get(); // skip '='
-        return null;
+        Expression body = expression();
+        Unary unary = new UnaryCall(variable, body);
+        return c -> { c.functions().unary(operator, unary); return Value.NaN; };
     }
 
     Expression defineBinary() {
-        return null;
+        String left = id(token);
+        if (left == null)
+            throw new ValueException("ID expected but '%s'", token.string());
+        get(); // skip left
+        String operator = idSpecial(token);
+        if (operator == null)
+            throw new ValueException("ID or SPECIAL expected but '%s'", token.string());
+        get(); // skip operator
+        String right = id(token);
+        if (right == null)
+            throw new ValueException("ID expected but '%s'", token.string());
+        get(); // skip right
+        Expression body = expression();
+        Binary binary = new BinaryCall(left, right, body);
+        return c -> { c.functions().binary(operator, binary); return Value.NaN; };
     }
 
     Expression primary() {

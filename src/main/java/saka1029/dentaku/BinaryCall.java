@@ -1,0 +1,20 @@
+package saka1029.dentaku;
+
+/**
+ * ユーザー定義の二項演算子を呼び出します。
+ */
+public record BinaryCall(
+    String leftVariable,
+    String rightVariable,
+    Expression body)
+    implements Binary {
+
+    @Override
+    public Value apply(Context context, Value left, Value right) {
+        Context child = context.child();
+        child.variable(leftVariable, left);
+        child.variable(rightVariable, right);
+        return body.eval(child);
+    }
+
+}

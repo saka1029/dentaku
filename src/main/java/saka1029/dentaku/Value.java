@@ -41,6 +41,10 @@ public class Value implements Expression {
         return this;
     }
 
+    public int size() {
+        return elements.length;
+    }
+
     public Value append(Value right) {
         int lSize = elements.length, rSize = right.elements.length;
         BigDecimal[] n = new BigDecimal[lSize + rSize];

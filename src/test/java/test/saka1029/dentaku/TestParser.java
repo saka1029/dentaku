@@ -42,6 +42,7 @@ public class TestParser {
     public void testUnary() {
         Functions ops = Functions.of();
         Context c = Context.of(ops);
+        assertEquals(value(4), eval(c, "length 1 2 3 4"));
         assertEquals(value(-1, -2, -3, -4), eval(c, "- 1 2 3 4"));
         assertEquals(value(10), eval(c, "+ 1 2 3 4"));
         assertEquals(value(24), eval(c, "* 1 2 3 4"));
@@ -80,5 +81,18 @@ public class TestParser {
         Context c = Context.of(ops);
         assertEquals(value(3, 4, 5), eval(c, "3 .. 5"));
         assertEquals(value(5, 4, 3), eval(c, "5 .. 3"));
+    }
+
+    @Test
+    public void testDefineUnary() {
+        Functions ops = Functions.of();
+        Context c = Context.of(ops);
+        assertEquals(Value.NaN, eval(c, "a = 1 .. 4"));
+        assertEquals(value(3, 4), eval(c, "a > 2 filter a"));
+        assertEquals(Value.NaN, eval(c, "select-gt2 x = x > 2 filter x"));
+        assertEquals(value(3, 4), eval(c, "select-gt2 a"));
+        assertEquals(value(3, 4), eval(c, "select-gt2 (1 .. 4)"));
+        assertEquals(Value.NaN, eval(c, "average x = + x / length x"));
+        assertEquals(value(2.5), eval(c, "average a"));
     }
 }

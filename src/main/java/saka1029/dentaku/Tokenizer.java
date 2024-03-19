@@ -93,7 +93,7 @@ public class Tokenizer {
     }
 
     static boolean isIdRest(int ch) {
-        return isIdFirst(ch) || Character.isDigit(ch);
+        return isIdFirst(ch) || Character.isDigit(ch) || ch == '-';
     }
 
     static boolean isDigit(int ch) {
