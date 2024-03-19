@@ -94,5 +94,18 @@ public class TestParser {
         assertEquals(value(3, 4), eval(c, "select-gt2 (1 .. 4)"));
         assertEquals(Value.NaN, eval(c, "average x = + x / length x"));
         assertEquals(value(2.5), eval(c, "average a"));
+        assertEquals(value(2, 4), eval(c, "not (a % 2) filter a"));
+        assertEquals(Value.NaN, eval(c, "even x = not (x % 2) filter x"));
+        assertEquals(value(2, 4, 6, 8, 10), eval(c, "even (1 .. 10)"));
+    }
+
+    @Test
+    public void testDefineBinary() {
+        Functions ops = Functions.of();
+        Context c = Context.of(ops);
+        assertEquals(Value.NaN, eval(c, "a = 1 .. 4"));
+        assertEquals(value(3, 4), eval(c, "a > 2 filter a"));
+        assertEquals(Value.NaN, eval(c, "p select-gt x = x > p filter x"));
+        assertEquals(value(3, 4), eval(c, "2 select-gt a"));
     }
 }

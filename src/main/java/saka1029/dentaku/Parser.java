@@ -139,6 +139,7 @@ public class Parser {
         if (right == null)
             throw new ValueException("ID expected but '%s'", token.string());
         get(); // skip right
+        get(); // skip '='
         Expression body = expression();
         Binary binary = new BinaryCall(left, right, body);
         return c -> { c.functions().binary(operator, binary); return Value.NaN; };
