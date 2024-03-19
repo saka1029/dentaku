@@ -178,13 +178,13 @@ public class Parser {
             if ((binary = binary(token)) != null) {
                 get();  // skip BOP
                 Expression e = unary();
-                return c -> high.apply(e.eval(c), binary);
+                return c -> high.apply(c, e.eval(c), binary);
             } else
                 throw new ValueException("BOP expected after '%s'", highName);
         } else if ((unary = unary(token)) != null) {
             get();  // skip UOP
             Expression e = unary();
-            return c -> unary.apply(e.eval(c));
+            return c -> unary.apply(c, e.eval(c));
         } else
             return sequence();
     }
@@ -196,7 +196,7 @@ public class Parser {
             get();  // skip BOP
             Binary binary = b;
             Expression left = e, right = unary();
-            e = c -> binary.apply(left.eval(c), right.eval(c));
+            e = c -> binary.apply(c, left.eval(c), right.eval(c));
         }
         return e;
     }

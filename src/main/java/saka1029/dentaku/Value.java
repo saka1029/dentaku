@@ -61,23 +61,23 @@ public class Value implements Expression {
             .toArray(BigDecimal[]::new));
     }
 
-    public Value reduce(Binary operator) {
+    public Value reduce(Context context, Binary operator) {
         if (elements.length <= 0)
             return EMPTY;
             // throw new ValueException("Empty value");
         Value result = Value.of(elements[0]);
         for (int i = 1; i < elements.length; ++i)
-            result = operator.apply(result, Value.of(elements[i]));
+            result = operator.apply(context, result, Value.of(elements[i]));
         return result;
     }
 
-    public Value cumulate(Binary operator) {
+    public Value cumulate(Context context, Binary operator) {
         if (elements.length <= 0)
             throw new ValueException("Empty value");
         Value v = Value.of(elements[0]);
         Value result = v;
         for (int i = 1; i < elements.length; ++i)
-            result = result.append(v = operator.apply(v, Value.of(elements[i])));
+            result = result.append(v = operator.apply(context, v, Value.of(elements[i])));
         return result;
     }
 
