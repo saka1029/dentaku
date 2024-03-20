@@ -30,6 +30,14 @@
     </dependency>
     -->
 
+    <!-- https://mvnrepository.com/artifact/org.jline/jline -->
+    <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline</artifactId>
+        <version>3.25.1</version>
+    </dependency>
+
+
   </dependencies>
    <build>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
