@@ -141,10 +141,8 @@ public class Value implements Expression {
     }
 
     public Value reverse() {
-        int length = elements.length;
-        BigDecimal[] result = new BigDecimal[length];
-        for (int i = 0, j = length - 1; i < length;)
-            result[j--] = elements[i++];
+        BigDecimal[] result = elements.clone();
+        Collections.reverse(Arrays.asList(result));
         return Value.of(result);
     }
 
