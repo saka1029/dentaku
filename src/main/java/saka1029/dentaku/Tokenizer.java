@@ -7,20 +7,23 @@ import java.util.Set;
 
 /**
  * <pre>
- * LP      = '('
- * RP      = ')'
- * ID      = JAVA-ALPHABETIC { JAVA-ALPHABETIC | JAVA-DIGIT }
- * SPECIAL = SP { SP }
- * SP      = '!' | '$' | '%' | '&' | '-'
- *         | '=' | '^' | '~' | '|' | '@'
- *         | '+' | '*' | '<' | '>' | '/'
- *         | '.'
- * NUMBER  = [ '-' ] DIGITS
- *           [ '.' DIGITS]
- *           [ ( 'e' | 'E') [ '+' | '-' ] DIGITS ]
- * DIGITS  = DIGIT { DIGIT }
- * DIGIT   = '0' | '1' | '2' | '3' | '4'
- *         | '5' | '6' | '7' | '8' | '9'
+ * LP       = '('
+ * RP       = ')'
+ * ID       = ID-FIRST { ID-REST }
+ * ID-FIRST = JAVA-ALPHABETIC | '_'
+ * ID-REST  = ID-FIRST | JAVA-DIGIT | '-'
+ * ID       = JAVA-ALPHABETIC { JAVA-ALPHABETIC | JAVA-DIGIT }
+ * SPECIAL  = SP { SP }
+ * SP       = '!' | '$' | '%' | '&' | '-'
+ *          | '=' | '^' | '~' | '|' | '@'
+ *          | '+' | '*' | '<' | '>' | '/'
+ *          | '.'
+ * NUMBER   = [ '-' ] DIGITS
+ *            [ '.' DIGITS]
+ *            [ ( 'e' | 'E') [ '+' | '-' ] DIGITS ]
+ * DIGITS   = DIGIT { DIGIT }
+ * DIGIT    = '0' | '1' | '2' | '3' | '4'
+ *          | '5' | '6' | '7' | '8' | '9'
  * </pre>
  */
 public class Tokenizer {
