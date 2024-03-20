@@ -6,8 +6,8 @@ package saka1029.dentaku;
 public record BinaryCall(
     String leftVariable,
     String rightVariable,
-    Expression body)
-    implements Binary {
+    Expression body,
+    String string) implements Binary {
 
     @Override
     public Value apply(Context context, Value left, Value right) {
@@ -17,4 +17,8 @@ public record BinaryCall(
         return body.eval(child);
     }
 
+    @Override
+    public final String toString() {
+        return string;
+    }
 }

@@ -28,13 +28,15 @@ import saka1029.dentaku.Tokenizer.Type;
  */
 public class Parser {
     final Functions functions;
+    final String input;
     final List<Token> tokens;
     int index;
     Token token;
 
     private Parser(Functions functions, String input) {
         this.functions = functions;
-        this.tokens = Tokenizer.tokens(input);
+        this.input = input.trim();
+        this.tokens = Tokenizer.tokens(this.input);
         this.index = 0;
         get();
     }
@@ -108,7 +110,17 @@ public class Parser {
         get(); // skip ID
         get(); // skip '='
         Expression e = expression();
-        return c -> { c.variable(name, e); return Value.NaN; };
+        Expression pe = new Expression() {
+            @Override
+            public Value eval(Context context) {
+                return e.eval(context);
+            }
+            @Override
+            public String toString() {
+                return input.toString();
+            }
+        };
+        return c -> { c.variable(name, pe); return Value.NaN; };
     }
 
     Expression defineUnary() {
@@ -122,7 +134,7 @@ public class Parser {
         get(); // skip variable
         get(); // skip '='
         Expression body = expression();
-        Unary unary = new UnaryCall(variable, body);
+        Unary unary = new UnaryCall(variable, body, input);
         return c -> { c.functions().unary(operator, unary); return Value.NaN; };
     }
 
@@ -141,7 +153,7 @@ public class Parser {
         get(); // skip right
         get(); // skip '='
         Expression body = expression();
-        Binary binary = new BinaryCall(left, right, body);
+        Binary binary = new BinaryCall(left, right, body, input);
         return c -> { c.functions().binary(operator, binary); return Value.NaN; };
     }
 
@@ -227,7 +239,18 @@ public class Parser {
             return defineUnary();
         if (is(peek(2), "="))
             return defineBinary();
-        else
-            return expression();
+        else {
+            Expression e = expression();
+            return new Expression() {
+                @Override
+                public Value eval(Context context) {
+                    return e.eval(context);
+                }
+                @Override
+                public String toString() {
+                    return input;
+                }
+            };
+        }
     }
 }

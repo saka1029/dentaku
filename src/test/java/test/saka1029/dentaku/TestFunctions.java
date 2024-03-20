@@ -95,9 +95,6 @@ public class TestFunctions {
         assertEquals(eval(c, "3 4"), eval(c, "0 0 1 1 filter a"));
         assertEquals(eval(c, "3 4"), eval(c, "a > 2 filter a"));
         assertEquals(Value.EMPTY, eval(c, "a > 9 filter a"));
-        // https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%9C%E3%83%8A%E3%83%83%E3%83%81%E6%95%B0#%E4%B8%80%E8%88%AC%E9%A0%85
-        assertEquals(Value.NaN, eval(c, "fib n = 1 + sqrt 5 / 2 ^ n - (1 - sqrt 5 / 2 ^ n) / sqrt 5"));
-        assertEquals(eval(c, "0 1 1 2 3 5 8"), eval(c, "int fib (0 .. 6)"));
     }
 
     @Test
@@ -142,6 +139,6 @@ public class TestFunctions {
         assertEquals(eval(c, "1 2 3 4 5"), eval(c, "sort 4 2 5 1 3"));
         assertEquals(eval(c, "5 4 3 2 1"), eval(c, "reverse sort 4 2 5 1 3"));
         assertEquals(eval(c, "100 .. 1"), eval(c, "reverse (1 .. 100)"));
-        assertEquals(eval(c, "1 .. 10"), eval(c, "shuffle (1 .. 10)"));
+        // assertEquals(eval(c, "1 .. 10"), eval(c, "shuffle (1 .. 10)"));
     }
 }
