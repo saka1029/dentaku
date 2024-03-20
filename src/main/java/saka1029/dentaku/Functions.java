@@ -83,6 +83,9 @@ public class Functions {
         uops.put("log", (c, v) -> v.map(x -> dec(Math.log(d(x)))));
         uops.put("log10", (c, v) -> v.map(x -> dec(Math.log10(d(x)))));
         uops.put("not", (c, v) -> v.map(x -> dec(!b(x))));
+        uops.put("sort", (c, v) -> v.sort());
+        uops.put("reverse", (c, v) -> v.reverse());
+        uops.put("shuffle", (c, v) -> v.shuffle());
         // binary operators
         bops.put("+", (c, l, r) -> l.binary(BigDecimal::add, r));
         bops.put("-", (c, l, r) -> l.binary(BigDecimal::subtract, r));

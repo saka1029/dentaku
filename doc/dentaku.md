@@ -8,10 +8,10 @@ statement       = define-variable
                 | define-binary
                 | expression
 define-variable = ID '=' expression
-define-unary    = IDSPECIAL ID '=' expression
-define-binary   = ID IDSPECIAL ID '=' expression
+define-unary    = ID-SPECIAL ID '=' expression
+define-binary   = ID ID-SPECIAL ID '=' expression
 expression      = unary { BOP unary }
-unary           = esequence
+unary           = sequence
                 | UOP unary
                 | HOP BOP unary
 sequence        = primary { primary }
@@ -24,7 +24,7 @@ primary         = '(' expression ')'
 ```
 ID              = JAVA-ALPHA { JAVA-ALPHA | JAVA-DIGIT}
 SPECAIL         = SP { SP }
-IDSPECIAL       = ID | SPECIAL
+ID-SPECIAL      = ID | SPECIAL
 BOP             = ID | SPECIAL
 UOP             = ID | SPECIAL
 HOP             = ID | SPECIAL

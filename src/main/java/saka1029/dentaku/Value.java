@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.function.UnaryOperator;
@@ -77,7 +78,8 @@ public class Value implements Expression {
 
     public Value cumulate(Context context, Binary operator) {
         if (elements.length <= 0)
-            throw new ValueException("Empty value");
+            return EMPTY;
+            // throw new ValueException("Empty value");
         Value v = Value.of(elements[0]);
         Value result = v;
         for (int i = 1; i < elements.length; ++i)
@@ -130,6 +132,26 @@ public class Value implements Expression {
             return new Value(result.toArray(BigDecimal[]::new));
         } else
             throw new ValueException("Length mismatch %d and %d", elements.length, right.elements.length);
+    }
+
+    public Value sort() {
+        return Value.of(Arrays.stream(elements)
+            .sorted()
+            .toArray(BigDecimal[]::new));
+    }
+
+    public Value reverse() {
+        int length = elements.length;
+        BigDecimal[] result = new BigDecimal[length];
+        for (int i = 0, j = length - 1; i < length;)
+            result[j--] = elements[i++];
+        return Value.of(result);
+    }
+
+    public Value shuffle() {
+        BigDecimal[] result = elements.clone();
+        Collections.shuffle(Arrays.asList(result));
+        return Value.of(result);
     }
 
     @Override

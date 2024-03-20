@@ -2,7 +2,6 @@ package test.saka1029.dentaku;
 
 import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import org.junit.Test;
 
