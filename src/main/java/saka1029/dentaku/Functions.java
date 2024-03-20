@@ -2,6 +2,7 @@ package saka1029.dentaku;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,6 +72,7 @@ public class Functions {
         uops.put("+", (c, v) -> v.reduce(c, (c1, l, r) -> l.binary(BigDecimal::add, r)));
         uops.put("*", (c, v) -> v.reduce(c, (c1, l, r) -> l.binary(BigDecimal::multiply, r)));
         uops.put("sign", (c, v) -> v.map(x -> dec(x.signum())));
+        uops.put("int", (c, v) -> v.map(x -> x.setScale(0, RoundingMode.HALF_UP)));
         uops.put("sqrt", (c, v) -> v.map(x -> dec(Math.sqrt(d(x)))));
         uops.put("sin", (c, v) -> v.map(x -> dec(Math.sin(d(x)))));
         uops.put("asin", (c, v) -> v.map(x -> dec(Math.asin(d(x)))));
@@ -88,6 +90,13 @@ public class Functions {
         bops.put("/", (c, l, r) -> l.binary((a, b) -> a.divide(b, MATH_CONTEXT), r));
         bops.put("%", (c, l, r) -> l.binary((a, b) -> a.remainder(b, MATH_CONTEXT), r));
         bops.put("^", (c, l, r) -> l.binary((a, b) -> dec(Math.pow(d(a), d(b))), r));
+        bops.put("round", (c, l, r) -> l.binary((a, b) -> a.setScale(b.intValue(), RoundingMode.HALF_UP), r));
+        bops.put("ceiling", (c, l, r) -> l.binary((a, b) -> a.setScale(b.intValue(), RoundingMode.CEILING), r));
+        bops.put("down", (c, l, r) -> l.binary((a, b) -> a.setScale(b.intValue(), RoundingMode.DOWN), r));
+        bops.put("floor", (c, l, r) -> l.binary((a, b) -> a.setScale(b.intValue(), RoundingMode.FLOOR), r));
+        // bops.put("half-down", (c, l, r) -> l.binary((a, b) -> a.setScale(b.intValue(), RoundingMode.HALF_DOWN), r));
+        // bops.put("half-up", (c, l, r) -> l.binary((a, b) -> a.setScale(b.intValue(), RoundingMode.HALF_UP), r));
+        bops.put("up", (c, l, r) -> l.binary((a, b) -> a.setScale(b.intValue(), RoundingMode.UP), r));
         bops.put("==", (c, l, r) -> l.binary((a, b) -> dec(a.compareTo(b) == 0), r));
         bops.put("~", (c, l, r) -> l.binary((a, b) -> dec(a.subtract(b).abs().compareTo(Value.EPSILON) < 0), r));
         bops.put("!=", (c, l, r) -> l.binary((a, b) -> dec(a.compareTo(b) != 0), r));

@@ -56,6 +56,8 @@ public class TestFunctions {
         assertEquals(value(0, 0, 0, 0), eval(c, "6 % 1 2 3 6"));
         assertEquals(value(1, 0, 0, 4), eval(c, "1 2 3 4 % 3 2 1 5"));
         assertEquals(value(1, 0, 1, 0), eval(c, "1 2 3 6 % 2"));
+        assertEquals(value(1, 2, 3, 5), eval(c, "1.2 2.3 3.4 4.5 round 0"));
+        assertEquals(value(1, 1, 1, 1), eval(c, "1.23 2.34 3.45 4.56 round 1 == 1.2 2.3 3.5 4.6"));
         assertEquals(value(8, 9, 10), eval(c, "8 .. 10"));
         assertEquals(value(8), eval(c, "8 .. 8"));
         assertEquals(value(10, 9, 8), eval(c, "10 .. 8"));
@@ -71,7 +73,9 @@ public class TestFunctions {
         assertEquals(value(3, 4), eval(c, "0 0 1 1 filter a"));
         assertEquals(value(3, 4), eval(c, "a > 2 filter a"));
         assertEquals(value(), eval(c, "a > 9 filter a"));
-        // System.out.println(eval(c, "a > 9 filter a"));
+        // https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%A3%E3%83%9C%E3%83%8A%E3%83%83%E3%83%81%E6%95%B0#%E4%B8%80%E8%88%AC%E9%A0%85
+        assertEquals(Value.NaN, eval(c, "fib n = 1 + sqrt 5 / 2 ^ n - (1 - sqrt 5 / 2 ^ n) / sqrt 5"));
+        assertEquals(value(0, 1, 1, 2, 3, 5, 8), eval(c, "int fib (0 .. 6)"));
     }
 
     @Test
