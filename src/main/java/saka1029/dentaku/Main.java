@@ -68,8 +68,8 @@ public class Main {
                 case ".end":
                     break L;
             }
-            Expression e = Parser.parse(functions, line);
             try {
+                Expression e = Parser.parse(functions, line);
                 Value value = e.eval(context);
                 if (value != Value.NaN)
                     out.println(value);

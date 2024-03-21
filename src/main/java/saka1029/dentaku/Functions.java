@@ -71,6 +71,7 @@ public class Functions {
         uops.put("-", (c, v) -> v.map(BigDecimal::negate));
         uops.put("+", (c, v) -> v.reduce(c, (c1, l, r) -> l.binary(BigDecimal::add, r)));
         uops.put("*", (c, v) -> v.reduce(c, (c1, l, r) -> l.binary(BigDecimal::multiply, r)));
+        uops.put("^", (c, v) -> v.reduce(c, (c1, l, r) -> l.binary((a, b) -> dec(Math.pow(d(a), d(b))), r)));
         uops.put("sign", (c, v) -> v.map(x -> dec(x.signum())));
         uops.put("int", (c, v) -> v.map(x -> x.setScale(0, RoundingMode.HALF_UP)));
         uops.put("sqrt", (c, v) -> v.map(x -> dec(Math.sqrt(d(x)))));
