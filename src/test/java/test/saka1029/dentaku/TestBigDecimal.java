@@ -29,4 +29,15 @@ public class TestBigDecimal {
         assertEquals(new BigDecimal("123.457"), round(new BigDecimal("123.456789"), 3));
     }
 
+    record Str<T>(T t, String s) {
+    }
+
+    @Test
+    public void testStr() {
+        Str<Integer> si = new Str<>(3, "three");
+        Str<String> ss = new Str<>("san", "three");
+        System.out.printf("si=%s%n", si);
+        System.out.printf("ss=%s%n", ss);
+    }
+
 }

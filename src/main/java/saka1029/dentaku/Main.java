@@ -29,6 +29,7 @@ public class Main {
             lineReader = LineReaderBuilder.builder()
                     .terminal(terminal)
                     .parser(parser)
+                    .variable(LineReader.SECONDARY_PROMPT_PATTERN, "    ")
                     .build();
             out = terminal.writer();
         }

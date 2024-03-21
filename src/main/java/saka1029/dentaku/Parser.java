@@ -110,17 +110,7 @@ public class Parser {
         get(); // skip ID
         get(); // skip '='
         Expression e = expression();
-        Expression pe = new Expression() {
-            @Override
-            public Value eval(Context context) {
-                return e.eval(context);
-            }
-            @Override
-            public String toString() {
-                return input.toString();
-            }
-        };
-        return c -> { c.variable(name, pe); return Value.NaN; };
+        return c -> { c.variable(name, e, input); return Value.NaN; };
     }
 
     Expression defineUnary() {
@@ -134,8 +124,8 @@ public class Parser {
         get(); // skip variable
         get(); // skip '='
         Expression body = expression();
-        Unary unary = new UnaryCall(variable, body, input);
-        return c -> { c.functions().unary(operator, unary); return Value.NaN; };
+        Unary unary = new UnaryCall(variable, body);
+        return c -> { c.functions().unary(operator, unary, input); return Value.NaN; };
     }
 
     Expression defineBinary() {
@@ -153,8 +143,8 @@ public class Parser {
         get(); // skip right
         get(); // skip '='
         Expression body = expression();
-        Binary binary = new BinaryCall(left, right, body, input);
-        return c -> { c.functions().binary(operator, binary); return Value.NaN; };
+        Binary binary = new BinaryCall(left, right, body);
+        return c -> { c.functions().binary(operator, binary, input); return Value.NaN; };
     }
 
     Expression primary() {

@@ -6,19 +6,13 @@ package saka1029.dentaku;
 public record BinaryCall(
     String leftVariable,
     String rightVariable,
-    Expression body,
-    String string) implements Binary {
+    Expression body) implements Binary {
 
     @Override
     public Value apply(Context context, Value left, Value right) {
         Context child = context.child();
-        child.variable(leftVariable, left);
-        child.variable(rightVariable, right);
+        child.variable(leftVariable, left, leftVariable);
+        child.variable(rightVariable, right, rightVariable);
         return body.eval(child);
-    }
-
-    @Override
-    public final String toString() {
-        return string;
     }
 }
