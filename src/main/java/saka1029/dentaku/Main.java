@@ -14,7 +14,7 @@ import org.jline.terminal.TerminalBuilder;
 public class Main {
 
     interface Term extends Closeable {
-        String readLine(String prompt) throws IOException;
+        String readLine() throws IOException;
         PrintWriter writer();
     }
 
@@ -22,14 +22,16 @@ public class Main {
         final Terminal terminal;
         final LineReader lineReader;
         final PrintWriter out;
+        final String prompt;
 
-        JlineConsole() throws IOException {
+        JlineConsole(String prompt, String prompt2) throws IOException {
+            this.prompt = prompt;
             terminal = TerminalBuilder.builder().build();
             org.jline.reader.Parser parser = new DefaultParser().eofOnEscapedNewLine(true);
             lineReader = LineReaderBuilder.builder()
                     .terminal(terminal)
                     .parser(parser)
-                    .variable(LineReader.SECONDARY_PROMPT_PATTERN, "    ")
+                    .variable(LineReader.SECONDARY_PROMPT_PATTERN, prompt2)
                     .build();
             out = terminal.writer();
         }
@@ -40,7 +42,7 @@ public class Main {
         }
 
         @Override
-        public String readLine(String prompt) throws IOException {
+        public String readLine() throws IOException {
             try {
                 return lineReader.readLine(prompt);
             } catch (EndOfFileException e) {
@@ -54,20 +56,73 @@ public class Main {
         }
     }
 
-    static void run(Term term, String prompt) throws IOException {
+    static void println(PrintWriter out, String s) {
+        if (s != null)
+            out.println(s);
+    }
+
+    static void help(Context context, PrintWriter out, String... items) {
+        if (items.length <= 1) {
+            out.println(".exit (or .quit .end) : exit program");
+            out.println(".help                 : show this message");
+            out.println(".help variable        : show all variables");
+            out.println(".help unary           : show all unary operators");
+            out.println(".help binary          : show all binary operators");
+            out.println(".help high            : show all high-order operators");
+            out.println(".help NAME            : show help for NAME");
+        } else if (items.length == 2) {
+            String name = items[1];
+            switch (name) {
+                case "variable":
+                    context.variables().stream()
+                        .sorted()
+                        .forEach(s -> out.println(s));
+                        break;
+                case "unary":
+                    context.functions().unarys().stream()
+                        .sorted()
+                        .forEach(s -> out.println(s));
+                        break;
+                case "binary":
+                    context.functions().binarys().stream()
+                        .sorted()
+                        .forEach(s -> out.println(s));
+                        break;
+                case "high":
+                    context.functions().highs().stream()
+                        .sorted()
+                        .forEach(s -> out.println(s));
+                        break;
+                default:
+                    println(out, context.variableString(name));
+                    println(out, context.functions().unaryString(name));
+                    println(out, context.functions().binaryString(name));
+                    println(out, context.functions().highString(name));
+                    break;
+            }
+        }
+    }
+
+    static void run(Term term) throws IOException {
         PrintWriter out = term.writer();
         Functions functions = Functions.of();
         Context context = Context.of(functions);
         L: while (true) {
-            String line = term.readLine(prompt);
+            String line = term.readLine();
             if (line == null)
                 break;
             line = line.trim();
-            switch (line) {
+            if (line.isEmpty())
+                continue;
+            String[] items = line.split("\\s+");
+            switch (items[0]) {
                 case ".quit":
                 case ".exit":
                 case ".end":
                     break L;
+                case ".help":
+                    help(context, out, items);
+                    continue L;
             }
             try {
                 Expression e = Parser.parse(functions, line);
@@ -81,9 +136,9 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        Term term = new JlineConsole();
-        String prompt = "  ";
-        run(term, prompt);
+        String prompt = "  ", prompt2 = "    ";
+        Term term = new JlineConsole(prompt, prompt2);
+        run(term);
     }
 
 }

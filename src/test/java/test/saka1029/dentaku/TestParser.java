@@ -27,13 +27,13 @@ public class TestParser {
         assertEquals(eval(c, "6"), e0.eval(c));
         Expression e1 = parse(ops, "  a = 1 + 2 + 3 ");
         assertEquals(Value.NaN, e1.eval(c));
-        assertEquals("a = 1 + 2 + 3", c.variable("a").toString());
+        assertEquals("a = 1 + 2 + 3", c.variableString("a"));
         Expression e2 = parse(ops, "  a x = 1 + x ");
         assertEquals(Value.NaN, e2.eval(c));
-        assertEquals("a x = 1 + x", ops.unary("a").toString());
+        assertEquals("a x = 1 + x", ops.unaryString("a"));
         Expression e3 = parse(ops, "  x a y = x + y ");
         assertEquals(Value.NaN, e3.eval(c));
-        assertEquals("x a y = x + y", ops.binary("a").toString());
+        assertEquals("x a y = x + y", ops.binaryString("a"));
     }
 
     @Test

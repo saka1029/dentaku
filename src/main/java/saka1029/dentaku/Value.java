@@ -162,6 +162,26 @@ public class Value implements Expression {
         return Value.of(result);
     }
 
+    public static boolean isPrime(BigDecimal v) {
+        if (v.compareTo(BigDecimal.ONE) <= 0)
+            return false;
+        if (v.compareTo(BigDecimal.TWO) == 0)
+            return true;
+        BigDecimal max = v.sqrt(MATH_CONTEXT);
+        for (BigDecimal d = BigDecimal.TWO; d.compareTo(max) <= 0; d = d.add(BigDecimal.ONE))
+            if (v.remainder(d, MATH_CONTEXT).equals(BigDecimal.ZERO))
+                return false;
+        return true;
+    }
+
+    public Value prime() {
+        List<BigDecimal> result = new ArrayList<>();
+        for (BigDecimal d : elements)
+            if (isPrime(d))
+                result.add(d);
+        return Value.of(result);
+    }
+
     @Override
     public int hashCode() {
         return Arrays.hashCode(elements);
