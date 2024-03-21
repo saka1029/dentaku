@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "dentaku",
+			"path": "../../../../.."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "automatic"
+	}
+}

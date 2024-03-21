@@ -89,7 +89,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>saka1029.util.main.ImageViewer</mainClass>
+              <mainClass>saka1029.dentaku.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
