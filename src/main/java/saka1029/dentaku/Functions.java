@@ -117,6 +117,7 @@ public class Functions {
         bops.put("..", (c, l, r) -> l.to(r));
         // high order operations
         hops.put("@", (c, v, b) -> v.reduce(c, b));
+        hops.put("@<", (c, v, b) -> v.reduceRight(c, b));
         hops.put("@@", (c, v, b) -> v.cumulate(c, b));
     }
 

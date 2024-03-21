@@ -69,10 +69,20 @@ public class Value implements Expression {
     public Value reduce(Context context, Binary operator) {
         if (elements.length <= 0)
             return EMPTY;
-            // throw new ValueException("Empty value");
         Value result = Value.of(elements[0]);
         for (int i = 1; i < elements.length; ++i)
             result = operator.apply(context, result, Value.of(elements[i]));
+        return result;
+    }
+
+
+    public Value reduceRight(Context context, Binary operator) {
+        int length = elements.length;
+        if (length <= 0)
+            return EMPTY;
+        Value result = Value.of(elements[length - 1]);
+        for (int i = length - 2; i >= 0; --i)
+            result = operator.apply(context, Value.of(elements[i]), result);
         return result;
     }
 
